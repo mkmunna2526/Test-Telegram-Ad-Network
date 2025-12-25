@@ -1,0 +1,1418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MomteTop - Earn Money</title>
+    
+    <!-- 
+    ============================================
+    📋 CONFIGURATION GUIDE
+    ============================================
+    
+    🔥 FIREBASE DATABASE RULES (Copy to Firebase Console → Realtime Database → Rules):
+    {
+      "rules": {
+        "users": {
+          "$userId": {
+            ".read": true,
+            ".write": true
+          }
+        },
+        "referrals": {
+          "$referrerId": {
+            ".read": true,
+            ".write": true
+          }
+        },
+        "withdrawals": {
+          ".read": true,
+          ".write": true
+        }
+      }
+    }
+    
+    📱 TELEGRAM BOT SETUP:
+    1. Go to @BotFather on Telegram
+    2. Send /setcommands
+    3. Copy these commands:
+    
+start - Start earning money
+balance - Check your balance
+referrals - View your referrals
+withdraw - Request withdrawal
+help - Get help
+    
+    ============================================
+    -->
+    
+    <style>
+/* --- Color Palette --- */
+/* Primary: #1E3A8A (Deep Blue) */
+/* Accent: #10B981 (Emerald Green) */
+/* Background: #F9FAFB (Light Gray) */
+/* Text: #1F2937 (Dark Gray) */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background-color: #F9FAFB;
+    min-height: 100vh;
+    color: #1F2937;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 0;
+}
+
+.container {
+    width: 100%;
+    max-width: 420px;
+    margin: 0;
+    background: white;
+    min-height: 100vh;
+    position: relative;
+    box-shadow: 0 0 40px rgba(0,0,0,0.05);
+}
+
+.header {
+    background: #1E3A8A; /* Deep Blue Primary */
+    color: white;
+    padding: 20px;
+    text-align: center;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.header h1 {
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+}
+
+.main-content {
+    padding: 20px;
+    padding-bottom: 100px; /* Space for bottom nav */
+}
+
+/* --- Card Styles --- */
+.card {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    border: 1px solid #E5E7EB;
+    margin-bottom: 20px;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.stat-card {
+    background: #F9FAFB;
+    padding: 15px;
+    border-radius: 12px;
+    text-align: center;
+    border: 1px solid #E5E7EB;
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+}
+
+.stat-value {
+    font-size: 22px;
+    font-weight: 700;
+    color: #1E3A8A; /* Primary color for value */
+    margin-bottom: 5px;
+}
+
+.stat-label {
+    font-size: 11px;
+    color: #6B7280;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.balance-card {
+    background: linear-gradient(135deg, #10B981 0%, #059669 100%); /* Emerald Green Gradient */
+    color: white;
+    padding: 30px 25px;
+    border-radius: 16px;
+    text-align: center;
+    margin-bottom: 25px;
+    box-shadow: 0 10px 25px rgba(16, 185, 129, 0.4);
+}
+
+.balance-amount {
+    font-size: 36px;
+    font-weight: 800;
+    margin-bottom: 5px;
+}
+
+.balance-label {
+    opacity: 0.9;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.watch-ad-section {
+    /* Inherits .card styles */
+    padding: 25px;
+}
+
+.vpn-warning {
+    background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%); /* Amber Gradient */
+    color: white;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+/* --- Buttons --- */
+.watch-btn {
+    width: 100%;
+    background: linear-gradient(135deg, #1E3A8A 0%, #3B82F6 100%); /* Primary Blue Gradient */
+    color: white;
+    border: none;
+    padding: 16px;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 10px rgba(30, 58, 138, 0.2);
+}
+
+.watch-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(30, 58, 138, 0.4);
+}
+
+.watch-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background: #9CA3AF;
+    box-shadow: none;
+}
+
+/* --- Progress Bar --- */
+.ad-progress {
+    margin: 20px 0;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 10px;
+    background: #E5E7EB;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #10B981 0%, #059669 100%);
+    border-radius: 5px;
+    transition: width 0.3s ease;
+}
+
+.progress-text {
+    text-align: center;
+    margin-top: 10px;
+    font-size: 14px;
+    color: #6B7280;
+}
+
+.daily-limit-warning {
+    background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%); /* Red Gradient */
+    color: white;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 600;
+    display: none;
+}
+
+.ad-network-info {
+    background: #F3F4F6;
+    padding: 12px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    font-size: 13px;
+    color: #4B5563;
+    text-align: center;
+    border: 1px solid #E5E7EB;
+}
+
+/* --- Floating Telegram Button --- */
+.telegram-btn {
+    position: fixed;
+    bottom: 100px;
+    right: 20px;
+    width: 56px;
+    height: 56px;
+    background: linear-gradient(135deg, #0088CC 0%, #0066AA 100%);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    box-shadow: 0 6px 15px rgba(0, 136, 204, 0.4);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.telegram-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 20px rgba(0, 136, 204, 0.6);
+}
+
+/* --- Bottom Navigation --- */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 420px;
+    background: white;
+    border-top: 1px solid #E5E7EB;
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 0;
+    box-shadow: 0 -4px 15px rgba(0,0,0,0.05);
+    z-index: 100;
+}
+
+.nav-btn {
+    background: none;
+    border: none;
+    padding: 8px 12px;
+    cursor: pointer;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    min-width: 70px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    color: #6B7280;
+}
+
+.nav-btn.active {
+    background: #E0E7FF; /* Light blue background for active */
+    color: #1E3A8A; /* Deep blue text for active */
+}
+
+.nav-btn:hover {
+    background: #F3F4F6;
+}
+
+.nav-btn.active:hover {
+    background: #E0E7FF;
+}
+
+.nav-icon {
+    font-size: 22px;
+}
+
+.nav-label {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.screen {
+    display: none;
+}
+
+.screen.active {
+    display: block;
+}
+
+/* --- Withdraw Screen Styles --- */
+.withdraw-form {
+    /* Inherits .card styles */
+    padding: 25px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #374151;
+    font-size: 14px;
+}
+
+.form-input {
+    width: 100%;
+    padding: 14px;
+    border: 1px solid #D1D5DB;
+    border-radius: 10px;
+    font-size: 16px;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    background-color: #FFFFFF;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: #1E3A8A;
+    box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.1);
+}
+
+.withdraw-btn {
+    width: 100%;
+    background: linear-gradient(135deg, #10B981 0%, #059669 100%); /* Emerald Green Gradient */
+    color: white;
+    border: none;
+    padding: 16px;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(16, 185, 129, 0.2);
+}
+
+.withdraw-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4);
+}
+
+.withdraw-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background: #9CA3AF;
+    box-shadow: none;
+}
+
+.requirements {
+    background: #FEF3C7;
+    border: 1px solid #FCD34D;
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+}
+
+.requirements h4 {
+    color: #92400E;
+    margin-bottom: 10px;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.requirements ul {
+    list-style: disc;
+    margin-left: 20px;
+    font-size: 14px;
+    color: #B45309;
+}
+
+.pending-status {
+    background: #DBEAFE;
+    color: #1E40AF;
+    padding: 20px;
+    border-radius: 16px;
+    text-align: center;
+    font-weight: 600;
+    margin-bottom: 20px;
+    line-height: 1.5;
+    border: 1px solid #93C5FD;
+}
+
+.need-more-referrals {
+    background: #FEE2E2;
+    color: #991B1B;
+    padding: 20px;
+    border-radius: 16px;
+    text-align: center;
+    font-weight: 600;
+    margin-bottom: 20px;
+    line-height: 1.5;
+    border: 1px solid #FCA5A5;
+}
+
+/* --- Tasks Screen Styles --- */
+.task-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: white;
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #E5E7EB;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+}
+
+.task-info h4 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1F2937;
+}
+
+.task-reward {
+    font-size: 14px;
+    color: #059669;
+    font-weight: 700;
+    margin-top: 5px;
+}
+
+.task-btn {
+    background: #10B981;
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.1s ease;
+}
+
+.task-btn:hover {
+    background: #059669;
+    transform: translateY(-1px);
+}
+
+/* --- Profile Screen Styles --- */
+.profile-info {
+    text-align: center;
+    margin-bottom: 30px;
+    padding: 20px;
+    background: #FFFFFF;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    border: 1px solid #E5E7EB;
+}
+
+.profile-avatar {
+    width: 80px;
+    height: 80px;
+    background: #1E3A8A;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 36px;
+    font-weight: 700;
+    margin: 0 auto 15px;
+    border: 4px solid #DBEAFE;
+}
+
+.profile-name {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1F2937;
+    margin-bottom: 5px;
+}
+
+.profile-id {
+    font-size: 14px;
+    color: #6B7280;
+}
+
+.referral-section {
+    background: linear-gradient(135deg, #1E3A8A 0%, #3B82F6 100%);
+    border-radius: 16px;
+    padding: 25px;
+    margin-bottom: 25px;
+    box-shadow: 0 8px 20px rgba(30, 58, 138, 0.3);
+}
+
+.referral-section h3 {
+    color: white;
+    margin-bottom: 10px;
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.referral-section p {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 14px;
+    margin-bottom: 15px;
+}
+
+.referral-input-group {
+    display: flex;
+    gap: 10px;
+}
+
+.referral-input {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    background: rgba(255, 255, 255, 0.95);
+    color: #1F2937;
+    font-weight: 500;
+}
+
+.copy-btn {
+    background: #FBBF24; /* Amber for copy action */
+    color: #1F2937;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.copy-btn:hover {
+    background: #F59E0B;
+    transform: translateY(-1px);
+}
+
+.referral-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.referral-stat {
+    background: rgba(255, 255, 255, 0.15);
+    padding: 15px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.referral-stat-value {
+    font-size: 22px;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 5px;
+}
+
+.referral-stat-label {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.8);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.alert {
+    padding: 15px;
+    border-radius: 12px;
+    margin: 15px 0;
+    font-weight: 600;
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.alert.success {
+    background: #D1FAE5;
+    color: #065F46;
+    border: 1px solid #A7F3D0;
+}
+
+.alert.error {
+    background: #FEE2E2;
+    color: #991B1B;
+    border: 1px solid #FCA5A5;
+}
+
+.alert.info {
+    background: #DBEAFE;
+    color: #1E40AF;
+    border: 1px solid #93C5FD;
+}
+
+@media (max-width: 480px) {
+    body {
+        align-items: stretch;
+    }
+    .container {
+        max-width: 100%;
+        min-height: 100vh;
+    }
+    
+    .bottom-nav {
+        width: 100%;
+        max-width: 100%;
+    }
+    
+    .telegram-btn {
+        right: 15px;
+        bottom: 100px;
+    }
+
+    .referral-input-group {
+        flex-direction: column;
+    }
+
+    .copy-btn {
+        width: 100%;
+    }
+}
+</style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>MomteTop</h1>
+        </div>
+
+        <!-- Telegram Channel Button -->
+        <button class="telegram-btn" onclick="openTelegramChannel()" title="Join our Telegram Channel">
+            📱
+        </button>
+
+        <!-- Home Screen -->
+        <div id="home" class="screen active">
+            <div class="main-content">
+                <!-- Balance Card -->
+                <div class="balance-card">
+                    <div class="balance-amount">$<span id="balance">0.00</span></div>
+                    <div class="balance-label">Total Balance</div>
+                </div>
+
+                <!-- Stats Grid -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="adsWatched">0</div>
+                        <div class="stat-label">Ads Watched Today</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="referrals">0</div>
+                        <div class="stat-label">Referrals</div>
+                    </div>
+                </div>
+
+                <!-- Watch Ad Section -->
+                <div class="watch-ad-section">
+                    <div class="vpn-warning" id="vpnWarning">
+                        ⚠️ Important: Connect to VPN if needed!
+                    </div>
+                    
+                    <div class="daily-limit-warning" id="dailyLimitWarning">
+                        🚫 Daily limit reached! Come back tomorrow!
+                    </div>
+                    
+                    <div class="ad-network-info" id="adNetworkInfo">
+                        📺 Network: <span id="currentAdNetwork">MoneyTag 1</span>
+                    </div>
+                    
+                    <div class="ad-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                        </div>
+                        <div class="progress-text" id="progressText">0/10 ads today</div>
+                    </div>
+
+                    <button class="watch-btn" id="watchAdBtn" onclick="watchAd()">
+                        Watch Ad & Earn $0.01
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Withdraw Screen -->
+        <div id="withdraw" class="screen">
+            <div class="main-content">
+                <div id="withdrawalPending" class="pending-status" style="display: none;">
+                    ⏳ WITHDRAWAL PENDING<br>
+                    Need <span id="pendingReferrals">10</span> more referrals
+                </div>
+
+                <div id="needMoreReferrals" class="need-more-referrals" style="display: none;">
+                    🚫 Cannot withdraw yet!<br>
+                    Need <span id="remainingReferrals">15</span> more referrals
+                </div>
+
+                <div id="withdrawalForm">
+                    <div class="requirements">
+                        <h4>⚠️ Requirements:</h4>
+                        <ul>
+                            <li>Minimum: $60.00</li>
+                            <li>Complete referrals</li>
+                            <li>Verified account</li>
+                        </ul>
+                    </div>
+
+                    <div class="withdraw-form">
+                        <h3 style="margin-bottom: 20px; color: #374151;">Withdraw Funds</h3>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Method</label>
+                            <select class="form-input" id="withdrawMethod">
+                                <option value="binance">Binance ID</option>
+                                <option value="payeer">Payeer</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Account ID</label>
+                            <input type="text" class="form-input" id="accountId" placeholder="Enter account ID">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Amount ($)</label>
+                            <input type="number" class="form-input" id="withdrawAmount" placeholder="Min $60">
+                        </div>
+
+                        <button class="withdraw-btn" id="withdrawBtn" onclick="processWithdrawal()" disabled>
+                            Request Withdrawal
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tasks Screen -->
+        <div id="tasks" class="screen">
+            <div class="main-content">
+                <h3 style="margin-bottom: 20px; color: #374151;">Complete Tasks</h3>
+                
+                <div class="task-item">
+                    <div class="task-info">
+                        <h4>Subscribe YouTube</h4>
+                        <div class="task-reward">+$0.50</div>
+                    </div>
+                    <button class="task-btn" onclick="openTask('youtube')">Start</button>
+                </div>
+
+                <div class="task-item">
+                    <div class="task-info">
+                        <h4>Join Telegram</h4>
+                        <div class="task-reward">+$0.30</div>
+                    </div>
+                    <button class="task-btn" onclick="openTask('telegram')">Start</button>
+                </div>
+
+                <div class="task-item">
+                    <div class="task-info">
+                        <h4>Follow Bot</h4>
+                        <div class="task-reward">+$0.20</div>
+                    </div>
+                    <button class="task-btn" onclick="openTask('bot')">Start</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Screen -->
+        <div id="profile" class="screen">
+            <div class="main-content">
+                <div class="profile-info">
+                    <div class="profile-avatar" id="profileAvatar">M</div>
+                    <div class="profile-name" id="profileName">MomteTop User</div>
+                    <div class="profile-id" id="profileTelegramId">Loading...</div>
+                </div>
+
+                <!-- Referral Section -->
+                <div class="referral-section">
+                    <h3>🎁 Invite & Earn</h3>
+                    <p>Earn $0.01 per friend!</p>
+                    
+                    <div class="referral-input-group">
+                        <input type="text" id="referralLink" class="referral-input" readonly>
+                        <button onclick="copyReferralLink()" class="copy-btn">Copy</button>
+                    </div>
+
+                    <div class="referral-stats">
+                        <div class="referral-stat">
+                            <div class="referral-stat-value" id="totalReferrals">0</div>
+                            <div class="referral-stat-label">Referrals</div>
+                        </div>
+                        <div class="referral-stat">
+                            <div class="referral-stat-value">$<span id="referralEarnings">0.00</span></div>
+                            <div class="referral-stat-label">Earned</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stats Grid -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value">$<span id="profileBalance">0.00</span></div>
+                        <div class="stat-label">Earnings</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="profileReferrals">0</div>
+                        <div class="stat-label">Referrals</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="profileAds">0</div>
+                        <div class="stat-label">Ads</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="joinDate">Today</div>
+                        <div class="stat-label">Member</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+            <button class="nav-btn active" onclick="switchScreen('home')">
+                <div class="nav-icon">🏠</div>
+                <div class="nav-label">Home</div>
+            </button>
+            <button class="nav-btn" onclick="switchScreen('withdraw')">
+                <div class="nav-icon">💳</div>
+                <div class="nav-label">Withdraw</div>
+            </button>
+            <button class="nav-btn" onclick="switchScreen('tasks')">
+                <div class="nav-icon">📋</div>
+                <div class="nav-label">Tasks</div>
+            </button>
+            <button class="nav-btn" onclick="switchScreen('profile')">
+                <div class="nav-icon">👤</div>
+                <div class="nav-label">Profile</div>
+            </button>
+        </div>
+    </div>
+
+    <!-- Firebase SDK (Version 9.22.0 - Tested & Working) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
+    <!-- Ad Network Scripts (Load after page) -->
+    <script>
+        // Load ad scripts dynamically
+        function loadAdScripts() {
+            const script1 = document.createElement('script');
+            script1.src = '//libtl.com/sdk.js';
+            script1.setAttribute('data-zone', '9786524');
+            script1.setAttribute('data-sdk', 'show_9786524');
+            document.head.appendChild(script1);
+            
+            const script2 = document.createElement('script');
+            script2.src = '//libtl.com/sdk.js';
+            script2.setAttribute('data-zone', '10144322');
+            script2.setAttribute('data-sdk', 'show_10144322');
+            document.head.appendChild(script2);
+            
+            console.log('✅ Ad scripts loading...');
+        }
+        
+        // Load ads after 2 seconds
+        setTimeout(loadAdScripts, 2000);
+    </script>
+
+    <script>
+        // ============================================
+        // CONFIGURATION
+        // ============================================
+        const FIREBASE_CONFIG = {
+            apiKey: "AIzaSyAcymPZJc4nWUU8rvDZMOWcpAUxqDbRvIU",
+            authDomain: "test-telegram-ad-network.firebaseapp.com",
+            databaseURL: "https://test-telegram-ad-network-default-rtdb.firebaseio.com",
+            projectId: "test-telegram-ad-network",
+            storageBucket: "test-telegram-ad-network.firebasestorage.app",
+            messagingSenderId: "663863390670",
+            appId: "1:663863390670:web:2211893d523eb0d221bb9f"
+        };
+
+        const TELEGRAM_BOT_TOKEN = '8572228978:AAHxP8IvpqdTvVFJjN6jLVMaS30z3IGF2QA';
+        const TELEGRAM_BOT_USERNAME = 'momtetop_bot';
+        const TELEGRAM_CHANNEL = 'https://t.me/momtetop';
+        const ADMIN_CHAT_ID = '7325613142';
+
+        const AD_NETWORKS = [
+            { name: 'MoneyTag 1', zone: '9786524', func: 'show_9786524', limit: 5 },
+            { name: 'MoneyTag 2', zone: '10144322', func: 'show_10144322', limit: 5 }
+        ];
+
+        const DAILY_AD_LIMIT = 10;
+        const AD_REWARD = 0.01;
+
+        // Firebase
+        let firebaseApp, firebaseDB;
+        
+        // App State
+        let appState = {
+            balance: 0,
+            adsWatched: 0,
+            dailyAdsWatched: 0,
+            network1AdsWatched: 0,
+            network2AdsWatched: 0,
+            lastAdDate: null,
+            referrals: 0,
+            userId: null,
+            telegramId: null,
+            telegramName: 'User',
+            joinDate: new Date().toISOString(),
+            withdrawalPending: false,
+            totalEarnings: 0,
+            referralEarnings: 0,
+            totalWithdrawals: 0,
+            lastReferralCount: 0,
+            withdrawalHistory: []
+        };
+
+        // ============================================
+        // FIREBASE INITIALIZATION
+        // ============================================
+        function initFirebase() {
+            try {
+                if (typeof firebase === 'undefined') {
+                    console.error('❌ Firebase not loaded, will retry...');
+                    setTimeout(initFirebase, 1000);
+                    return false;
+                }
+                
+                firebaseApp = firebase.initializeApp(FIREBASE_CONFIG);
+                firebaseDB = firebase.database();
+                
+                // Get Telegram User ID from URL parameters
+                const urlParams = new URLSearchParams(window.location.search);
+                const tgWebAppStartParam = urlParams.get('tgWebAppStartParam');
+                
+                let userId = null;
+                let referrerId = null;
+                
+                if (tgWebAppStartParam) {
+                    const parts = tgWebAppStartParam.split('_');
+                    userId = parts[0];
+                    if (parts.length > 1) {
+                        referrerId = parts[1];
+                    }
+                }
+                
+                // Fallback for testing
+                if (!userId) {
+                    userId = 'test_user_12345';
+                    console.warn('⚠️ Using fallback test user ID.');
+                }
+                
+                appState.userId = userId;
+                appState.telegramId = userId; // Assuming userId is the telegramId for simplicity
+                
+                // Load user data
+                loadUserData(userId, referrerId);
+                
+                // Initialize event listeners
+                initEventListeners();
+                
+                return true;
+            } catch (e) {
+                console.error('❌ Firebase initialization failed:', e);
+                return false;
+            }
+        }
+
+        // ============================================
+        // DATA HANDLING
+        // ============================================
+        function loadUserData(userId, referrerId) {
+            const userRef = firebaseDB.ref('users/' + userId);
+            userRef.once('value', (snapshot) => {
+                let userData = snapshot.val();
+                
+                if (userData) {
+                    // User exists, load data
+                    appState = { ...appState, ...userData };
+                    console.log('✅ User data loaded:', appState);
+                    
+                    // Check for daily reset
+                    const today = new Date().toDateString();
+                    if (appState.lastAdDate !== today) {
+                        appState.dailyAdsWatched = 0;
+                        appState.network1AdsWatched = 0;
+                        appState.network2AdsWatched = 0;
+                        appState.lastAdDate = today;
+                        saveUserData(); // Save reset data
+                    }
+                    
+                } else {
+                    // New user, initialize and save
+                    if (referrerId && referrerId !== userId) {
+                        handleReferral(referrerId, userId);
+                    }
+                    appState.joinDate = new Date().toLocaleDateString();
+                    saveUserData();
+                    console.log('✨ New user initialized:', appState);
+                }
+                
+                updateUI();
+            });
+        }
+
+        function saveUserData() {
+            if (appState.userId) {
+                const userRef = firebaseDB.ref('users/' + appState.userId);
+                userRef.set(appState)
+                    .then(() => console.log('✅ User data saved.'))
+                    .catch(error => console.error('❌ Error saving user data:', error));
+            }
+        }
+
+        function handleReferral(referrerId, newUserId) {
+            const referrerRef = firebaseDB.ref('users/' + referrerId);
+            referrerRef.once('value', (snapshot) => {
+                if (snapshot.exists()) {
+                    const referrerData = snapshot.val();
+                    
+                    // 1. Give reward to referrer
+                    const referralReward = 0.01;
+                    referrerData.balance = (referrerData.balance || 0) + referralReward;
+                    referrerData.referrals = (referrerData.referrals || 0) + 1;
+                    referrerData.referralEarnings = (referrerData.referralEarnings || 0) + referralReward;
+                    
+                    firebaseDB.ref('users/' + referrerId).set(referrerData)
+                        .then(() => console.log(`✅ Referral reward given to ${referrerId}`))
+                        .catch(error => console.error('❌ Error giving referral reward:', error));
+                    
+                    // 2. Log referral
+                    const referralLogRef = firebaseDB.ref('referrals/' + referrerId);
+                    referralLogRef.push({
+                        newUserId: newUserId,
+                        timestamp: new Date().toISOString()
+                    });
+                }
+            });
+        }
+
+        // ============================================
+        // UI UPDATES
+        // ============================================
+        function updateUI() {
+            // Home Screen
+            document.getElementById('balance').textContent = appState.balance.toFixed(2);
+            document.getElementById('adsWatched').textContent = appState.dailyAdsWatched;
+            document.getElementById('referrals').textContent = appState.referrals;
+            
+            const progressText = `${appState.dailyAdsWatched}/${DAILY_AD_LIMIT} ads today`;
+            document.getElementById('progressText').textContent = progressText;
+            
+            const progressPercent = (appState.dailyAdsWatched / DAILY_AD_LIMIT) * 100;
+            document.getElementById('progressFill').style.width = `${progressPercent}%`;
+            
+            const watchBtn = document.getElementById('watchAdBtn');
+            const dailyLimitWarning = document.getElementById('dailyLimitWarning');
+            
+            if (appState.dailyAdsWatched >= DAILY_AD_LIMIT) {
+                watchBtn.disabled = true;
+                dailyLimitWarning.style.display = 'block';
+            } else {
+                watchBtn.disabled = false;
+                dailyLimitWarning.style.display = 'none';
+            }
+            
+            // Ad Network Info
+            const currentNetwork = getCurrentAdNetwork();
+            document.getElementById('currentAdNetwork').textContent = currentNetwork.name;
+            
+            // Profile Screen
+            document.getElementById('profileBalance').textContent = appState.balance.toFixed(2);
+            document.getElementById('profileReferrals').textContent = appState.referrals;
+            document.getElementById('profileAds').textContent = appState.adsWatched;
+            document.getElementById('joinDate').textContent = appState.joinDate;
+            document.getElementById('totalReferrals').textContent = appState.referrals;
+            document.getElementById('referralEarnings').textContent = appState.referralEarnings.toFixed(2);
+            
+            // Referral Link
+            const referralLink = `https://t.me/${TELEGRAM_BOT_USERNAME}?start=${appState.userId}`;
+            document.getElementById('referralLink').value = referralLink;
+            
+            // Withdrawal Screen
+            updateWithdrawalUI();
+        }
+
+        function updateWithdrawalUI() {
+            const withdrawBtn = document.getElementById('withdrawBtn');
+            const withdrawAmountInput = document.getElementById('withdrawAmount');
+            const withdrawalForm = document.getElementById('withdrawalForm');
+            const withdrawalPending = document.getElementById('withdrawalPending');
+            const needMoreReferrals = document.getElementById('needMoreReferrals');
+            
+            // Check if withdrawal is pending
+            if (appState.withdrawalPending) {
+                withdrawalForm.style.display = 'none';
+                withdrawalPending.style.display = 'block';
+                needMoreReferrals.style.display = 'none';
+                document.getElementById('pendingReferrals').textContent = Math.max(0, 10 - appState.referrals);
+                return;
+            }
+            
+            // Check referral requirement (Example: need 15 referrals to unlock form)
+            const MIN_REFERRALS_TO_UNLOCK = 15;
+            if (appState.referrals < MIN_REFERRALS_TO_UNLOCK) {
+                withdrawalForm.style.display = 'none';
+                withdrawalPending.style.display = 'none';
+                needMoreReferrals.style.display = 'block';
+                document.getElementById('remainingReferrals').textContent = MIN_REFERRALS_TO_UNLOCK - appState.referrals;
+                return;
+            }
+            
+            // Form is unlocked
+            withdrawalForm.style.display = 'block';
+            withdrawalPending.style.display = 'none';
+            needMoreReferrals.style.display = 'none';
+            
+            // Check balance requirement
+            const MIN_WITHDRAWAL = 60.00;
+            const amount = parseFloat(withdrawAmountInput.value) || 0;
+            
+            if (amount >= MIN_WITHDRAWAL && appState.balance >= amount) {
+                withdrawBtn.disabled = false;
+            } else {
+                withdrawBtn.disabled = true;
+            }
+        }
+
+        // ============================================
+        // CORE LOGIC
+        // ============================================
+        function getCurrentAdNetwork() {
+            // Simple round-robin based on daily limit
+            if (appState.network1AdsWatched < AD_NETWORKS[0].limit) {
+                return AD_NETWORKS[0];
+            } else if (appState.network2AdsWatched < AD_NETWORKS[1].limit) {
+                return AD_NETWORKS[1];
+            }
+            // Should not happen if daily limit check is correct, but fallback to first
+            return AD_NETWORKS[0];
+        }
+
+        function watchAd() {
+            if (appState.dailyAdsWatched >= DAILY_AD_LIMIT) {
+                alert('Daily limit reached!');
+                return;
+            }
+            
+            const currentNetwork = getCurrentAdNetwork();
+            
+            // 1. Show Ad (Simulated)
+            console.log(`🎬 Showing ad from network: ${currentNetwork.name}`);
+            
+            // In a real scenario, you would call the ad network's function here
+            // window[currentNetwork.func](); 
+            
+            // 2. Update state after successful ad view (Simulated delay for realism)
+            const watchBtn = document.getElementById('watchAdBtn');
+            watchBtn.disabled = true;
+            watchBtn.textContent = 'Watching Ad...';
+            
+            setTimeout(() => {
+                // Update balance
+                appState.balance += AD_REWARD;
+                appState.totalEarnings += AD_REWARD;
+                
+                // Update ad counts
+                appState.adsWatched += 1;
+                appState.dailyAdsWatched += 1;
+                if (currentNetwork.name === AD_NETWORKS[0].name) {
+                    appState.network1AdsWatched += 1;
+                } else {
+                    appState.network2AdsWatched += 1;
+                }
+                
+                // Save and update UI
+                saveUserData();
+                updateUI();
+                
+                watchBtn.textContent = `Watch Ad & Earn $${AD_REWARD.toFixed(2)}`;
+                
+                // Show success alert
+                showAlert('success', `✅ Earned $${AD_REWARD.toFixed(2)}!`);
+                
+            }, 3000); // Simulate 3 second ad view
+        }
+
+        function processWithdrawal() {
+            const amount = parseFloat(document.getElementById('withdrawAmount').value);
+            const method = document.getElementById('withdrawMethod').value;
+            const accountId = document.getElementById('accountId').value.trim();
+            
+            const MIN_WITHDRAWAL = 60.00;
+            
+            if (amount < MIN_WITHDRAWAL) {
+                showAlert('error', `❌ Minimum withdrawal is $${MIN_WITHDRAWAL.toFixed(2)}.`);
+                return;
+            }
+            
+            if (amount > appState.balance) {
+                showAlert('error', `❌ Insufficient balance. Your balance is $${appState.balance.toFixed(2)}.`);
+                return;
+            }
+            
+            if (!accountId) {
+                showAlert('error', '❌ Please enter your account ID.');
+                return;
+            }
+            
+            // Disable button and set pending state
+            const withdrawBtn = document.getElementById('withdrawBtn');
+            withdrawBtn.disabled = true;
+            withdrawBtn.textContent = 'Processing...';
+            
+            // 1. Deduct balance and set withdrawal pending flag
+            appState.balance -= amount;
+            appState.withdrawalPending = true;
+            appState.totalWithdrawals += amount;
+            
+            // 2. Log withdrawal request
+            const withdrawalRequest = {
+                userId: appState.userId,
+                telegramId: appState.telegramId,
+                amount: amount,
+                method: method,
+                accountId: accountId,
+                timestamp: new Date().toISOString(),
+                status: 'Pending'
+            };
+            
+            firebaseDB.ref('withdrawals').push(withdrawalRequest)
+                .then(() => {
+                    // 3. Notify Admin (Simulated via console log, in real life use Telegram Bot API)
+                    console.log(`🔔 New Withdrawal Request: User ${appState.userId}, Amount $${amount.toFixed(2)}, Method ${method}`);
+                    
+                    // 4. Save updated user state
+                    saveUserData();
+                    updateUI();
+                    
+                    showAlert('info', `⏳ Withdrawal request for $${amount.toFixed(2)} submitted. Processing takes 24-48 hours.`);
+                    
+                    // Reset button text (will be hidden by updateWithdrawalUI)
+                    withdrawBtn.textContent = 'Request Withdrawal';
+                })
+                .catch(error => {
+                    console.error('❌ Error submitting withdrawal:', error);
+                    showAlert('error', '❌ Failed to submit withdrawal request. Please try again.');
+                    
+                    // Revert state on failure
+                    appState.balance += amount;
+                    appState.withdrawalPending = false;
+                    appState.totalWithdrawals -= amount;
+                    withdrawBtn.disabled = false;
+                    withdrawBtn.textContent = 'Request Withdrawal';
+                    saveUserData();
+                    updateUI();
+                });
+        }
+
+        // ============================================
+        // UTILITIES
+        // ============================================
+        function switchScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            document.getElementById(screenId).classList.add('active');
+            
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`.nav-btn[onclick="switchScreen('${screenId}')"]`).classList.add('active');
+            
+            // Re-render UI for the new screen if necessary
+            if (screenId === 'withdraw') {
+                updateWithdrawalUI();
+            }
+        }
+
+        function copyReferralLink() {
+            const linkInput = document.getElementById('referralLink');
+            linkInput.select();
+            linkInput.setSelectionRange(0, 99999); // For mobile devices
+            document.execCommand('copy');
+            showAlert('success', '🔗 Referral link copied to clipboard!');
+        }
+
+        function openTelegramChannel() {
+            window.open(TELEGRAM_CHANNEL, '_blank');
+        }
+
+        function openTask(taskType) {
+            let url = '';
+            switch(taskType) {
+                case 'youtube':
+                    url = 'https://youtube.com/yourchannel'; // Replace with actual link
+                    break;
+                case 'telegram':
+                    url = TELEGRAM_CHANNEL;
+                    break;
+                case 'bot':
+                    url = `https://t.me/${TELEGRAM_BOT_USERNAME}`;
+                    break;
+            }
+            
+            if (url) {
+                window.open(url, '_blank');
+                showAlert('info', `Redirecting to ${taskType} task...`);
+            }
+        }
+
+        function showAlert(type, message) {
+            const alertContainer = document.createElement('div');
+            alertContainer.className = `alert ${type}`;
+            alertContainer.textContent = message;
+            
+            const mainContent = document.querySelector('.main-content.active') || document.querySelector('.main-content');
+            
+            // Insert alert at the top of the current screen's main content
+            if (mainContent) {
+                mainContent.insertBefore(alertContainer, mainContent.firstChild);
+            } else {
+                document.querySelector('.container').insertBefore(alertContainer, document.querySelector('.container').firstChild);
+            }
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                alertContainer.style.opacity = '0';
+                alertContainer.style.transition = 'opacity 0.5s ease';
+                setTimeout(() => alertContainer.remove(), 500);
+            }, 5000);
+        }
+
+        function initEventListeners() {
+            // Listen for input on withdrawal amount to enable/disable button
+            const withdrawAmountInput = document.getElementById('withdrawAmount');
+            if (withdrawAmountInput) {
+                withdrawAmountInput.addEventListener('input', updateWithdrawalUI);
+            }
+        }
+
+        // ============================================
+        // START APP
+        // ============================================
+        document.addEventListener('DOMContentLoaded', () => {
+            initFirebase();
+        });
+    </script>
+</body>
+</html>
