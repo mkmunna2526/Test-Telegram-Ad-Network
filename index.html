@@ -884,10 +884,38 @@
             
             try {
                 const userRef = firebaseDB.ref('users/' + appState.userId);
-                await userRef.set({
-                    ...appState,
+                
+                const dataToSave = {
+                    userId: appState.userId,
+                    telegramId: appState.telegramId,
+                    telegramName: appState.telegramName,
+                    telegramUsername: appState.telegramUsername,
+                    telegramPhotoUrl: appState.telegramPhotoUrl,
+                    balance: appState.balance,
+                    adsWatched: appState.adsWatched,
+                    dailyAdsWatched: appState.dailyAdsWatched,
+                    network1AdsWatched: appState.network1AdsWatched,
+                    network2AdsWatched: appState.network2AdsWatched,
+                    lastAdDate: appState.lastAdDate,
+                    referrals: appState.referrals,
+                    referralEarnings: appState.referralEarnings,
+                    totalEarnings: appState.totalEarnings,
+                    totalIncome: appState.totalIncome,
+                    withdrawalPending: appState.withdrawalPending,
+                    totalWithdrawals: appState.totalWithdrawals,
+                    lastReferralCount: appState.lastReferralCount,
+                    completedTasks: appState.completedTasks,
+                    joinDate: appState.joinDate,
                     lastUpdated: firebase.database.ServerValue.TIMESTAMP
-                });
+                };
+                
+                await userRef.set(dataToSave);
+                
+                // Save telegram ID to localStorage for persistence
+                if (appState.telegramId) {
+                    localStorage.setItem('telegram_user_id', appState.telegramId.toString());
+                }
+                
                 console.log('✅ Saved to Firebase:', appState.userId);
             } catch (error) {
                 console.error('❌ Firebase save error:', error);
@@ -908,13 +936,29 @@
                     const savedData = snapshot.val();
                     console.log('✅ Loaded from Firebase:', savedData);
                     
-                    // Merge saved data - keep fresh telegram data if available, otherwise use saved
+                    // Merge: Keep all saved data, override only telegram info if fresh data exists
                     appState = {
-                        ...savedData,
+                        userId: appState.userId,
                         telegramId: appState.telegramId || savedData.telegramId,
                         telegramName: appState.telegramName || savedData.telegramName || 'User',
                         telegramUsername: appState.telegramUsername || savedData.telegramUsername,
-                        telegramPhotoUrl: appState.telegramPhotoUrl || savedData.telegramPhotoUrl
+                        telegramPhotoUrl: appState.telegramPhotoUrl || savedData.telegramPhotoUrl,
+                        balance: savedData.balance || 0,
+                        adsWatched: savedData.adsWatched || 0,
+                        dailyAdsWatched: savedData.dailyAdsWatched || 0,
+                        network1AdsWatched: savedData.network1AdsWatched || 0,
+                        network2AdsWatched: savedData.network2AdsWatched || 0,
+                        lastAdDate: savedData.lastAdDate || null,
+                        referrals: savedData.referrals || 0,
+                        referralEarnings: savedData.referralEarnings || 0,
+                        totalEarnings: savedData.totalEarnings || 0,
+                        totalIncome: savedData.totalIncome || 0,
+                        withdrawalPending: savedData.withdrawalPending || false,
+                        totalWithdrawals: savedData.totalWithdrawals || 0,
+                        lastReferralCount: savedData.lastReferralCount || 0,
+                        withdrawalHistory: savedData.withdrawalHistory || [],
+                        completedTasks: savedData.completedTasks || [],
+                        joinDate: savedData.joinDate || new Date().toISOString()
                     };
                     
                     dataLoaded = true;
@@ -922,6 +966,7 @@
                     // Save immediately to update any new telegram info
                     await saveToFirebase();
                     
+                    console.log('✅ Data merged successfully');
                     return true;
                 }
                 
@@ -941,46 +986,98 @@
         // ==========================================
         async function getTelegramUserData() {
             try {
-                // Method 1: Telegram WebApp API
+                console.log('🔍 Getting Telegram user data...');
+                
+                // Method 1: Telegram WebApp API (when opened via bot)
                 if (window.Telegram && window.Telegram.WebApp) {
                     const tg = window.Telegram.WebApp;
-                    const user = tg.initDataUnsafe.user;
+                    tg.ready();
                     
-                    if (user) {
-                        console.log('✅ Got Telegram data from WebApp:', user);
-                        appState.telegramId = user.id;
+                    const user = tg.initDataUnsafe?.user;
+                    
+                    if (user && user.id) {
+                        console.log('✅ Got data from Telegram WebApp:', user);
+                        
+                        appState.telegramId = parseInt(user.id);
                         appState.telegramName = user.first_name + (user.last_name ? ' ' + user.last_name : '');
                         appState.telegramUsername = user.username || null;
                         appState.userId = 'tg_' + user.id;
                         
-                        // Get photo
-                        await getTelegramPhoto(user.id);
+                        // Get photo from Telegram API
+                        if (user.photo_url) {
+                            appState.telegramPhotoUrl = user.photo_url;
+                        } else {
+                            await getTelegramPhoto(user.id);
+                        }
+                        
+                        console.log('✅ User ID:', appState.userId);
+                        console.log('✅ Telegram ID:', appState.telegramId);
+                        console.log('✅ Username:', appState.telegramUsername);
+                        
                         return true;
                     }
                 }
                 
-                // Method 2: URL Parameters
+                // Method 2: URL Parameters (fallback)
                 const urlParams = new URLSearchParams(window.location.search);
-                const tgId = urlParams.get('tg_id');
+                let tgId = urlParams.get('tg_id') || urlParams.get('user_id');
+                
+                // Try to get from hash as well
+                if (!tgId && window.location.hash) {
+                    const hashParams = new URLSearchParams(window.location.hash.substring(1));
+                    tgId = hashParams.get('tgWebAppStartParam') || hashParams.get('tg_id');
+                }
                 
                 if (tgId) {
-                    console.log('✅ Got Telegram data from URL:', tgId);
-                    appState.telegramId = tgId;
-                    appState.telegramName = urlParams.get('tg_name') || 'User';
-                    appState.telegramUsername = urlParams.get('tg_username') || null;
+                    console.log('✅ Got Telegram ID from URL:', tgId);
+                    
+                    appState.telegramId = parseInt(tgId);
+                    appState.telegramName = urlParams.get('tg_name') || urlParams.get('name') || 'User';
+                    appState.telegramUsername = urlParams.get('tg_username') || urlParams.get('username') || null;
                     appState.userId = 'tg_' + tgId;
                     
                     await getTelegramPhoto(tgId);
+                    
+                    console.log('✅ User ID:', appState.userId);
+                    console.log('✅ Telegram ID:', appState.telegramId);
+                    console.log('✅ Username:', appState.telegramUsername);
+                    
                     return true;
                 }
                 
-                // Method 3: Fallback - generate temp ID
-                console.log('⚠️ No Telegram data - using temp ID');
-                appState.userId = 'user_' + Math.random().toString(36).substr(2, 9);
+                // Method 3: Check localStorage for saved ID
+                const savedUserId = localStorage.getItem('telegram_user_id');
+                if (savedUserId) {
+                    console.log('✅ Found saved Telegram ID:', savedUserId);
+                    appState.telegramId = parseInt(savedUserId);
+                    appState.userId = 'tg_' + savedUserId;
+                    
+                    // Try to load data from Firebase
+                    const userRef = firebaseDB.ref('users/' + appState.userId);
+                    const snapshot = await userRef.once('value');
+                    if (snapshot.exists()) {
+                        const savedData = snapshot.val();
+                        appState.telegramName = savedData.telegramName || 'User';
+                        appState.telegramUsername = savedData.telegramUsername || null;
+                        appState.telegramPhotoUrl = savedData.telegramPhotoUrl || null;
+                        
+                        console.log('✅ Restored from Firebase');
+                        return true;
+                    }
+                }
+                
+                // Method 4: Create temporary ID (will be replaced when bot data comes)
+                console.log('⚠️ No Telegram ID found - creating temporary');
+                const tempId = 'guest_' + Date.now();
+                appState.userId = tempId;
+                appState.telegramName = 'Guest User';
+                
                 return false;
             } catch (error) {
-                console.error('❌ Telegram data error:', error);
-                appState.userId = 'user_' + Math.random().toString(36).substr(2, 9);
+                console.error('❌ Error getting Telegram data:', error);
+                const tempId = 'guest_' + Date.now();
+                appState.userId = tempId;
+                appState.telegramName = 'Guest User';
                 return false;
             }
         }
