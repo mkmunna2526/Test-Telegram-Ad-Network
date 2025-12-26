@@ -908,17 +908,20 @@
                     const savedData = snapshot.val();
                     console.log('✅ Loaded from Firebase:', savedData);
                     
-                    // Merge saved data
+                    // Merge saved data - keep fresh telegram data if available, otherwise use saved
                     appState = {
-                        ...appState,
                         ...savedData,
-                        telegramId: appState.telegramId,
-                        telegramName: appState.telegramName,
-                        telegramUsername: appState.telegramUsername,
+                        telegramId: appState.telegramId || savedData.telegramId,
+                        telegramName: appState.telegramName || savedData.telegramName || 'User',
+                        telegramUsername: appState.telegramUsername || savedData.telegramUsername,
                         telegramPhotoUrl: appState.telegramPhotoUrl || savedData.telegramPhotoUrl
                     };
                     
                     dataLoaded = true;
+                    
+                    // Save immediately to update any new telegram info
+                    await saveToFirebase();
+                    
                     return true;
                 }
                 
