@@ -585,11 +585,13 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Image URL (Optional)</label>
-                    <input type="url" class="form-input" id="broadcastImage" placeholder="https://example.com/image.jpg">
+                    <label class="form-label">Image (Optional)</label>
+                    <input type="file" class="form-input" id="broadcastImageFile" accept="image/*" onchange="handleImageUpload(this)">
+                    <input type="url" class="form-input" id="broadcastImage" placeholder="Or paste image URL" style="margin-top: 10px;">
                     <small style="color: #64748b; display: block; margin-top: 5px;">
-                        💡 Tip: Upload to <a href="https://imgbb.com" target="_blank">ImgBB</a> and paste the direct link
+                        💡 Select from gallery or paste URL from <a href="https://imgbb.com" target="_blank">ImgBB</a>
                     </small>
+                    <div id="imagePreview" style="margin-top: 10px;"></div>
                 </div>
 
                 <div class="form-group">
@@ -1003,9 +1005,27 @@
         // ==========================================
         // BROADCAST
         // ==========================================
+        let uploadedImageBase64 = null;
+
+        function handleImageUpload(input) {
+            const file = input.files[0];
+            if (!file) return;
+            
+            // Show preview
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                uploadedImageBase64 = e.target.result;
+                document.getElementById('imagePreview').innerHTML = 
+                    '<img src="' + e.target.result + '" style="max-width: 200px; border-radius: 8px; margin-top: 10px;">';
+                document.getElementById('broadcastImage').value = ''; // Clear URL input
+                updateBroadcastPreview();
+            };
+            reader.readAsDataURL(file);
+        }
+
         function updateBroadcastPreview() {
             const text = document.getElementById('broadcastText').value;
-            const imageUrl = document.getElementById('broadcastImage').value;
+            const imageUrl = document.getElementById('broadcastImage').value || uploadedImageBase64;
             const buttonText = document.getElementById('broadcastButtonText').value;
             const buttonUrl = document.getElementById('broadcastButtonUrl').value;
             
