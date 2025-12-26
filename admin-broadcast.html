@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel - Broadcast Messages</title>
+    <title>Admin - Task Management</title>
     
     <style>
         * {
@@ -20,7 +20,7 @@
         }
 
         .container {
-            max-width: 800px;
+            max-width: 1000px;
             margin: 0 auto;
             background: white;
             border-radius: 20px;
@@ -49,46 +49,41 @@
             padding: 30px;
         }
 
-        .stats-section {
-            background: #f8fafc;
-            padding: 20px;
-            border-radius: 15px;
-            margin-bottom: 30px;
-            border: 2px solid #e2e8f0;
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
         }
 
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
-            margin-top: 15px;
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
         }
 
-        .stat-box {
-            background: white;
-            padding: 15px;
-            border-radius: 10px;
-            text-align: center;
-            border: 1px solid #e2e8f0;
+        .btn-success {
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            color: white;
         }
 
-        .stat-value {
-            font-size: 24px;
-            font-weight: 700;
-            color: #667eea;
+        .btn-danger {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
         }
 
-        .stat-label {
-            font-size: 12px;
-            color: #64748b;
-            margin-top: 5px;
-            text-transform: uppercase;
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
         }
 
         .form-section {
             background: #f8fafc;
             padding: 25px;
             border-radius: 15px;
+            margin-bottom: 30px;
             border: 2px solid #e2e8f0;
         }
 
@@ -100,8 +95,7 @@
             display: block;
             font-weight: 600;
             color: #374151;
-            margin-bottom: 10px;
-            font-size: 14px;
+            margin-bottom: 8px;
         }
 
         .form-input {
@@ -110,7 +104,6 @@
             border: 2px solid #e2e8f0;
             border-radius: 10px;
             font-size: 14px;
-            font-family: inherit;
             transition: border-color 0.3s ease;
         }
 
@@ -119,161 +112,49 @@
             border-color: #667eea;
         }
 
-        textarea.form-input {
-            min-height: 120px;
-            resize: vertical;
-        }
-
-        .button-group {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-top: 20px;
-        }
-
-        .btn {
-            padding: 15px;
-            border: none;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
-        }
-
-        .btn-success {
-            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
-            color: white;
-        }
-
-        .btn-success:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(34, 197, 94, 0.4);
-        }
-
-        .btn-danger {
-            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-            color: white;
-        }
-
-        .btn-danger:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(239, 68, 68, 0.4);
-        }
-
-        .btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none !important;
-        }
-
-        .log-section {
-            margin-top: 30px;
+        .task-list {
             background: #f8fafc;
-            padding: 20px;
+            padding: 25px;
             border-radius: 15px;
             border: 2px solid #e2e8f0;
-            max-height: 400px;
-            overflow-y: auto;
         }
 
-        .log-item {
-            padding: 10px;
-            margin-bottom: 8px;
-            border-radius: 8px;
-            font-size: 13px;
-            font-family: 'Courier New', monospace;
-        }
-
-        .log-success {
-            background: #d1fae5;
-            color: #065f46;
-            border-left: 4px solid #22c55e;
-        }
-
-        .log-error {
-            background: #fee2e2;
-            color: #991b1b;
-            border-left: 4px solid #ef4444;
-        }
-
-        .log-info {
-            background: #dbeafe;
-            color: #1e40af;
-            border-left: 4px solid #3b82f6;
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 8px;
-            background: #e2e8f0;
-            border-radius: 4px;
-            overflow: hidden;
-            margin-top: 15px;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #4ade80 0%, #22c55e 100%);
-            border-radius: 4px;
-            transition: width 0.3s ease;
-            width: 0%;
-        }
-
-        .progress-text {
-            text-align: center;
-            margin-top: 8px;
-            font-size: 13px;
-            color: #64748b;
-            font-weight: 600;
-        }
-
-        .image-preview {
-            max-width: 100%;
-            max-height: 300px;
-            border-radius: 10px;
-            margin-top: 10px;
-            display: none;
-        }
-
-        .file-input-wrapper {
-            position: relative;
-            overflow: hidden;
-            display: inline-block;
-            width: 100%;
-        }
-
-        .file-input-wrapper input[type=file] {
-            position: absolute;
-            left: -9999px;
-        }
-
-        .file-input-label {
-            display: block;
-            padding: 12px;
+        .task-item {
             background: white;
-            border: 2px dashed #e2e8f0;
-            border-radius: 10px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        .file-input-label:hover {
-            border-color: #667eea;
-            background: #f8fafc;
+        .task-info h4 {
+            color: #374151;
+            margin-bottom: 5px;
+        }
+
+        .task-reward {
+            color: #059669;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .task-url {
+            color: #6b7280;
+            font-size: 13px;
+            margin-top: 5px;
+        }
+
+        .task-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .task-actions button {
+            padding: 8px 15px;
+            font-size: 14px;
         }
 
         .alert {
@@ -281,18 +162,6 @@
             border-radius: 12px;
             margin-bottom: 20px;
             font-weight: 600;
-            animation: slideIn 0.3s ease;
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
         }
 
         .alert-success {
@@ -307,104 +176,94 @@
             border: 1px solid #fca5a5;
         }
 
-        .alert-info {
-            background: #dbeafe;
-            color: #1e40af;
-            border: 1px solid #93c5fd;
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .stat-box {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 12px;
+            border: 2px solid #e2e8f0;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: #64748b;
+            text-transform: uppercase;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>📢 Admin Broadcast Panel</h1>
-            <p>Send messages to all users via Telegram</p>
+            <h1>📋 Task Management</h1>
+            <p>Add, edit, and manage tasks</p>
         </div>
 
         <div class="content">
             <!-- Alert Container -->
             <div id="alertContainer"></div>
 
-            <!-- Stats Section -->
-            <div class="stats-section">
-                <h3 style="color: #374151; margin-bottom: 10px;">📊 User Statistics</h3>
-                <div class="stats-grid">
-                    <div class="stat-box">
-                        <div class="stat-value" id="totalUsers">0</div>
-                        <div class="stat-label">Total Users</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-value" id="activeUsers">0</div>
-                        <div class="stat-label">Active Today</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-value" id="totalReferrals">0</div>
-                        <div class="stat-label">Total Referrals</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-value" id="pendingWithdrawals">0</div>
-                        <div class="stat-label">Pending Withdrawals</div>
-                    </div>
+            <!-- Stats -->
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <div class="stat-value" id="totalTasks">0</div>
+                    <div class="stat-label">Total Tasks</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="totalRewards">$0.00</div>
+                    <div class="stat-label">Total Rewards</div>
                 </div>
             </div>
 
-            <!-- Broadcast Form -->
+            <!-- Add/Edit Task Form -->
             <div class="form-section">
-                <h3 style="color: #374151; margin-bottom: 20px;">✉️ Send Broadcast Message</h3>
+                <h3 style="margin-bottom: 20px; color: #374151;">
+                    <span id="formTitle">Add New Task</span>
+                </h3>
                 
                 <div class="form-group">
-                    <label class="form-label">Message Text:</label>
-                    <textarea class="form-input" id="messageText" placeholder="Enter your message here...
-Example:
-🎉 Don't let your free Pawcoins escape—claim them right now!
-
-💰 Special offer ending soon!"></textarea>
+                    <label class="form-label">Task Title</label>
+                    <input type="text" class="form-input" id="taskTitle" placeholder="e.g., Subscribe YouTube Channel">
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Image (Optional):</label>
-                    <div class="file-input-wrapper">
-                        <input type="file" id="imageInput" accept="image/*" onchange="previewImage(event)">
-                        <label for="imageInput" class="file-input-label">
-                            📷 Click to upload image (optional)
-                        </label>
-                    </div>
-                    <img id="imagePreview" class="image-preview">
+                    <label class="form-label">Task URL</label>
+                    <input type="url" class="form-input" id="taskUrl" placeholder="https://youtube.com/...">
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Button Text (Optional):</label>
-                    <input type="text" class="form-input" id="buttonText" placeholder="e.g., Play 🎰">
+                    <label class="form-label">Reward Amount ($)</label>
+                    <input type="number" step="0.01" class="form-input" id="taskReward" placeholder="0.50">
                 </div>
 
-                <div class="form-group">
-                    <label class="form-label">Button URL (Optional):</label>
-                    <input type="text" class="form-input" id="buttonUrl" placeholder="e.g., https://t.me/your_bot">
-                </div>
-
-                <div class="button-group">
-                    <button class="btn btn-primary" onclick="sendTestMessage()">
-                        📤 Send Test (To Admin)
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn btn-success" onclick="saveTask()">
+                        <span id="saveButtonText">💾 Save Task</span>
                     </button>
-                    <button class="btn btn-success" id="broadcastBtn" onclick="sendBroadcast()">
-                        📢 Send to All Users
+                    <button class="btn btn-danger" onclick="cancelEdit()" id="cancelButton" style="display: none;">
+                        ❌ Cancel
                     </button>
-                </div>
-
-                <!-- Progress Bar -->
-                <div id="progressSection" style="display: none;">
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="progressFill"></div>
-                    </div>
-                    <div class="progress-text" id="progressText">0 / 0 sent</div>
                 </div>
             </div>
 
-            <!-- Log Section -->
-            <div class="log-section">
-                <h3 style="color: #374151; margin-bottom: 15px;">📋 Activity Log</h3>
-                <div id="logContainer">
-                    <div class="log-item log-info">Waiting for action...</div>
+            <!-- Task List -->
+            <div class="task-list">
+                <h3 style="margin-bottom: 20px; color: #374151;">Existing Tasks</h3>
+                <div id="taskListContainer">
+                    <div class="alert alert-info">Loading tasks...</div>
                 </div>
             </div>
         </div>
@@ -415,7 +274,7 @@ Example:
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 
     <script>
-        // Configuration
+        // Firebase Configuration
         const FIREBASE_CONFIG = {
             apiKey: "AIzaSyAcymPZJc4nWUU8rvDZMOWcpAUxqDbRvIU",
             authDomain: "test-telegram-ad-network.firebaseapp.com",
@@ -426,345 +285,170 @@ Example:
             appId: "1:663863390670:web:2211893d523eb0d221bb9f"
         };
 
-        const TELEGRAM_BOT_TOKEN = '8572228978:AAHxP8IvpqdTvVFJjN6jLVMaS30z3IGF2QA';
-        const ADMIN_CHAT_ID = '7325613142';
-
         let firebaseApp, firebaseDB;
+        let editingTaskId = null;
 
         // Initialize Firebase
         function initFirebase() {
             try {
                 firebaseApp = firebase.initializeApp(FIREBASE_CONFIG);
                 firebaseDB = firebase.database();
-                addLog('Firebase initialized successfully', 'success');
-                loadUserStats();
+                console.log('✅ Firebase initialized');
+                loadTasks();
             } catch (error) {
-                addLog('Firebase initialization failed: ' + error.message, 'error');
+                console.error('Firebase error:', error);
+                showAlert('Failed to initialize Firebase', 'error');
             }
         }
 
-        // Load user statistics
-        async function loadUserStats() {
+        // Load all tasks
+        async function loadTasks() {
             try {
-                // Total Users
-                const usersRef = firebaseDB.ref('users');
-                const usersSnapshot = await usersRef.once('value');
-                const users = usersSnapshot.val() || {};
-                const totalUsers = Object.keys(users).length;
-                document.getElementById('totalUsers').textContent = totalUsers;
-
-                // Active Users (last 24 hours)
-                const yesterday = Date.now() - (24 * 60 * 60 * 1000);
-                let activeUsers = 0;
-                Object.values(users).forEach(user => {
-                    if (user.lastUpdated && user.lastUpdated > yesterday) {
-                        activeUsers++;
-                    }
-                });
-                document.getElementById('activeUsers').textContent = activeUsers;
-
-                // Total Referrals
-                const referralsRef = firebaseDB.ref('referrals');
-                const referralsSnapshot = await referralsRef.once('value');
-                const referrals = referralsSnapshot.val() || {};
-                let totalReferrals = 0;
-                Object.values(referrals).forEach(userRefs => {
-                    totalReferrals += Object.keys(userRefs).length;
-                });
-                document.getElementById('totalReferrals').textContent = totalReferrals;
-
-                // Pending Withdrawals
-                const withdrawalsRef = firebaseDB.ref('withdrawals');
-                const withdrawalsSnapshot = await withdrawalsRef.once('value');
-                const withdrawals = withdrawalsSnapshot.val() || {};
-                let pendingCount = 0;
-                Object.values(withdrawals).forEach(withdrawal => {
-                    if (withdrawal.status === 'pending') {
-                        pendingCount++;
-                    }
-                });
-                document.getElementById('pendingWithdrawals').textContent = pendingCount;
-
-                addLog(`Loaded stats: ${totalUsers} users, ${activeUsers} active, ${totalReferrals} referrals`, 'success');
-            } catch (error) {
-                addLog('Error loading stats: ' + error.message, 'error');
-            }
-        }
-
-        // Get all users with Telegram IDs
-        async function getAllUsers() {
-            try {
-                const usersRef = firebaseDB.ref('users');
-                const snapshot = await usersRef.once('value');
-                const users = snapshot.val() || {};
+                const tasksRef = firebaseDB.ref('tasks');
+                const snapshot = await tasksRef.once('value');
+                const tasks = snapshot.val() || {};
                 
-                const userList = [];
-                Object.values(users).forEach(user => {
-                    if (user.telegramId) {
-                        userList.push({
-                            telegramId: user.telegramId,
-                            name: user.telegramName || 'User',
-                            userId: user.userId
-                        });
-                    }
-                });
+                const container = document.getElementById('taskListContainer');
+                container.innerHTML = '';
                 
-                return userList;
-            } catch (error) {
-                addLog('Error getting users: ' + error.message, 'error');
-                return [];
-            }
-        }
-
-        // Send Telegram message
-        async function sendTelegramMessage(chatId, message, imageUrl = null, buttonText = null, buttonUrl = null) {
-            try {
-                let url, body;
-
-                if (imageUrl) {
-                    // Send photo with caption
-                    url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendPhoto`;
-                    body = {
-                        chat_id: chatId,
-                        photo: imageUrl,
-                        caption: message,
-                        parse_mode: 'HTML'
-                    };
+                const taskCount = Object.keys(tasks).length;
+                let totalRewards = 0;
+                
+                if (taskCount === 0) {
+                    container.innerHTML = '<div style="text-align: center; color: #6b7280; padding: 20px;">No tasks yet. Add your first task!</div>';
                 } else {
-                    // Send text message
-                    url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
-                    body = {
-                        chat_id: chatId,
-                        text: message,
-                        parse_mode: 'HTML'
-                    };
+                    Object.entries(tasks).forEach(([taskId, task]) => {
+                        totalRewards += task.reward || 0;
+                        
+                        const taskItem = document.createElement('div');
+                        taskItem.className = 'task-item';
+                        taskItem.innerHTML = `
+                            <div class="task-info">
+                                <h4>${task.title}</h4>
+                                <div class="task-reward">Reward: $${task.reward.toFixed(2)}</div>
+                                <div class="task-url">${task.url}</div>
+                            </div>
+                            <div class="task-actions">
+                                <button class="btn btn-primary" onclick="editTask('${taskId}', ${JSON.stringify(task).replace(/"/g, '&quot;')})">
+                                    ✏️ Edit
+                                </button>
+                                <button class="btn btn-danger" onclick="deleteTask('${taskId}')">
+                                    🗑️ Delete
+                                </button>
+                            </div>
+                        `;
+                        container.appendChild(taskItem);
+                    });
                 }
-
-                // Add inline keyboard if button provided
-                if (buttonText && buttonUrl) {
-                    body.reply_markup = {
-                        inline_keyboard: [[{
-                            text: buttonText,
-                            url: buttonUrl
-                        }]]
-                    };
-                }
-
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(body)
-                });
-
-                const data = await response.json();
-                return data.ok;
+                
+                // Update stats
+                document.getElementById('totalTasks').textContent = taskCount;
+                document.getElementById('totalRewards').textContent = '$' + totalRewards.toFixed(2);
+                
             } catch (error) {
-                console.error('Error sending message:', error);
-                return false;
+                console.error('Error loading tasks:', error);
+                showAlert('Failed to load tasks', 'error');
             }
         }
 
-        // Upload image to imgbb
-        async function uploadImage(file) {
+        // Save task (add or update)
+        async function saveTask() {
+            const title = document.getElementById('taskTitle').value.trim();
+            const url = document.getElementById('taskUrl').value.trim();
+            const reward = parseFloat(document.getElementById('taskReward').value);
+            
+            if (!title || !url || !reward || reward <= 0) {
+                showAlert('Please fill all fields correctly', 'error');
+                return;
+            }
+            
             try {
-                const formData = new FormData();
-                formData.append('image', file);
-
-                // Using free image hosting service (you can use your own)
-                const response = await fetch('https://api.imgbb.com/1/upload?key=YOUR_IMGBB_API_KEY', {
-                    method: 'POST',
-                    body: formData
-                });
-
-                const data = await response.json();
-                if (data.success) {
-                    return data.data.url;
-                }
-                return null;
-            } catch (error) {
-                addLog('Error uploading image: ' + error.message, 'error');
-                return null;
-            }
-        }
-
-        // Preview image
-        function previewImage(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const preview = document.getElementById('imagePreview');
-                    preview.src = e.target.result;
-                    preview.style.display = 'block';
+                const taskData = {
+                    title: title,
+                    url: url,
+                    reward: reward,
+                    createdAt: firebase.database.ServerValue.TIMESTAMP
                 };
-                reader.readAsDataURL(file);
-            }
-        }
-
-        // Send test message
-        async function sendTestMessage() {
-            const message = document.getElementById('messageText').value.trim();
-            const buttonText = document.getElementById('buttonText').value.trim();
-            const buttonUrl = document.getElementById('buttonUrl').value.trim();
-
-            if (!message) {
-                showAlert('Please enter a message!', 'error');
-                return;
-            }
-
-            addLog('Sending test message to admin...', 'info');
-
-            const imageFile = document.getElementById('imageInput').files[0];
-            let imageUrl = null;
-
-            if (imageFile) {
-                addLog('Uploading image...', 'info');
-                imageUrl = await uploadImage(imageFile);
-                if (!imageUrl) {
-                    showAlert('Failed to upload image. Sending without image.', 'error');
-                }
-            }
-
-            const success = await sendTelegramMessage(
-                ADMIN_CHAT_ID,
-                message,
-                imageUrl,
-                buttonText,
-                buttonUrl
-            );
-
-            if (success) {
-                addLog('✅ Test message sent successfully!', 'success');
-                showAlert('Test message sent to admin!', 'success');
-            } else {
-                addLog('❌ Failed to send test message', 'error');
-                showAlert('Failed to send test message', 'error');
-            }
-        }
-
-        // Send broadcast to all users
-        async function sendBroadcast() {
-            const message = document.getElementById('messageText').value.trim();
-            const buttonText = document.getElementById('buttonText').value.trim();
-            const buttonUrl = document.getElementById('buttonUrl').value.trim();
-
-            if (!message) {
-                showAlert('Please enter a message!', 'error');
-                return;
-            }
-
-            if (!confirm('Are you sure you want to send this message to ALL users?')) {
-                return;
-            }
-
-            const broadcastBtn = document.getElementById('broadcastBtn');
-            broadcastBtn.disabled = true;
-            broadcastBtn.textContent = '⏳ Sending...';
-
-            addLog('Starting broadcast...', 'info');
-
-            // Get all users
-            const users = await getAllUsers();
-            if (users.length === 0) {
-                addLog('No users found!', 'error');
-                showAlert('No users to send to!', 'error');
-                broadcastBtn.disabled = false;
-                broadcastBtn.textContent = '📢 Send to All Users';
-                return;
-            }
-
-            addLog(`Found ${users.length} users`, 'success');
-
-            // Upload image if provided
-            const imageFile = document.getElementById('imageInput').files[0];
-            let imageUrl = null;
-
-            if (imageFile) {
-                addLog('Uploading image...', 'info');
-                imageUrl = await uploadImage(imageFile);
-                if (imageUrl) {
-                    addLog('Image uploaded successfully', 'success');
-                } else {
-                    addLog('Failed to upload image, sending without it', 'error');
-                }
-            }
-
-            // Show progress
-            document.getElementById('progressSection').style.display = 'block';
-
-            let sentCount = 0;
-            let failedCount = 0;
-
-            // Send to all users with delay
-            for (let i = 0; i < users.length; i++) {
-                const user = users[i];
                 
-                const success = await sendTelegramMessage(
-                    user.telegramId,
-                    message,
-                    imageUrl,
-                    buttonText,
-                    buttonUrl
-                );
-
-                if (success) {
-                    sentCount++;
-                    addLog(`✅ Sent to ${user.name} (${user.telegramId})`, 'success');
+                if (editingTaskId) {
+                    // Update existing task
+                    await firebaseDB.ref('tasks/' + editingTaskId).update(taskData);
+                    showAlert('✅ Task updated successfully!', 'success');
                 } else {
-                    failedCount++;
-                    addLog(`❌ Failed to send to ${user.name} (${user.telegramId})`, 'error');
+                    // Add new task
+                    await firebaseDB.ref('tasks').push(taskData);
+                    showAlert('✅ Task added successfully!', 'success');
                 }
-
-                // Update progress
-                const progress = ((i + 1) / users.length) * 100;
-                document.getElementById('progressFill').style.width = progress + '%';
-                document.getElementById('progressText').textContent = `${i + 1} / ${users.length} sent`;
-
-                // Delay to avoid rate limiting (30 messages per second max)
-                await new Promise(resolve => setTimeout(resolve, 50));
+                
+                // Reset form
+                clearForm();
+                loadTasks();
+                
+            } catch (error) {
+                console.error('Error saving task:', error);
+                showAlert('Failed to save task', 'error');
             }
+        }
 
-            // Final results
-            addLog(`Broadcast complete! Sent: ${sentCount}, Failed: ${failedCount}`, 'success');
-            showAlert(`Broadcast complete! Sent to ${sentCount} users (${failedCount} failed)`, 'success');
+        // Edit task
+        function editTask(taskId, task) {
+            editingTaskId = taskId;
+            
+            document.getElementById('taskTitle').value = task.title;
+            document.getElementById('taskUrl').value = task.url;
+            document.getElementById('taskReward').value = task.reward;
+            
+            document.getElementById('formTitle').textContent = 'Edit Task';
+            document.getElementById('saveButtonText').textContent = '💾 Update Task';
+            document.getElementById('cancelButton').style.display = 'inline-block';
+            
+            // Scroll to form
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
 
-            broadcastBtn.disabled = false;
-            broadcastBtn.textContent = '📢 Send to All Users';
+        // Cancel edit
+        function cancelEdit() {
+            clearForm();
+        }
 
-            // Hide progress after 3 seconds
-            setTimeout(() => {
-                document.getElementById('progressSection').style.display = 'none';
-            }, 3000);
+        // Delete task
+        async function deleteTask(taskId) {
+            if (!confirm('Are you sure you want to delete this task?')) {
+                return;
+            }
+            
+            try {
+                await firebaseDB.ref('tasks/' + taskId).remove();
+                showAlert('✅ Task deleted successfully!', 'success');
+                loadTasks();
+            } catch (error) {
+                console.error('Error deleting task:', error);
+                showAlert('Failed to delete task', 'error');
+            }
+        }
+
+        // Clear form
+        function clearForm() {
+            editingTaskId = null;
+            document.getElementById('taskTitle').value = '';
+            document.getElementById('taskUrl').value = '';
+            document.getElementById('taskReward').value = '';
+            document.getElementById('formTitle').textContent = 'Add New Task';
+            document.getElementById('saveButtonText').textContent = '💾 Save Task';
+            document.getElementById('cancelButton').style.display = 'none';
         }
 
         // Show alert
         function showAlert(message, type) {
             const alertContainer = document.getElementById('alertContainer');
             const alert = document.createElement('div');
-            alert.className = `alert alert-${type}`;
+            alert.className = 'alert alert-' + type;
             alert.textContent = message;
             alertContainer.appendChild(alert);
-
-            setTimeout(() => {
+            
+            setTimeout(function() {
                 alert.remove();
             }, 5000);
-        }
-
-        // Add log entry
-        function addLog(message, type = 'info') {
-            const logContainer = document.getElementById('logContainer');
-            const logItem = document.createElement('div');
-            logItem.className = `log-item log-${type}`;
-            
-            const timestamp = new Date().toLocaleTimeString();
-            logItem.textContent = `[${timestamp}] ${message}`;
-            
-            logContainer.insertBefore(logItem, logContainer.firstChild);
-
-            // Keep only last 50 logs
-            while (logContainer.children.length > 50) {
-                logContainer.removeChild(logContainer.lastChild);
-            }
         }
 
         // Initialize on load
