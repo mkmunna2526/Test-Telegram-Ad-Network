@@ -3,48 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MomteTop - Earn Money</title>
-    
-    <!-- 
-    ============================================
-    📋 CONFIGURATION GUIDE
-    ============================================
-    
-    🔥 FIREBASE DATABASE RULES (Copy to Firebase Console → Realtime Database → Rules):
-    {
-      "rules": {
-        "users": {
-          "$userId": {
-            ".read": true,
-            ".write": true
-          }
-        },
-        "referrals": {
-          "$referrerId": {
-            ".read": true,
-            ".write": true
-          }
-        },
-        "withdrawals": {
-          ".read": true,
-          ".write": true
-        }
-      }
-    }
-    
-    📱 TELEGRAM BOT SETUP:
-    1. Go to @BotFather on Telegram
-    2. Send /setcommands
-    3. Copy these commands:
-    
-start - Start earning money
-balance - Check your balance
-referrals - View your referrals
-withdraw - Request withdrawal
-help - Get help
-    
-    ============================================
-    -->
+    <title>Earn Money - Watch Ads</title>
     
     <style>
         * {
@@ -69,24 +28,11 @@ help - Get help
             box-shadow: 0 0 30px rgba(0,0,0,0.1);
         }
 
-        .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 20px;
-            text-align: center;
-            position: relative;
-        }
-
-        .header h1 {
-            font-size: 28px;
-            font-weight: 700;
-            letter-spacing: 1px;
-        }
-
         .main-content {
             padding: 20px;
+            padding-top: 20px;
             padding-bottom: 80px;
-            min-height: calc(100vh - 100px);
+            min-height: 100vh;
         }
 
         .stats-grid {
@@ -154,17 +100,6 @@ help - Get help
             border: 1px solid #e2e8f0;
         }
 
-        .vpn-warning {
-            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-            color: white;
-            padding: 15px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            text-align: center;
-            font-size: 14px;
-            font-weight: 600;
-        }
-
         .watch-btn {
             width: 100%;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -226,16 +161,6 @@ help - Get help
             font-size: 14px;
             font-weight: 600;
             display: none;
-        }
-
-        .ad-network-info {
-            background: #f1f5f9;
-            padding: 12px;
-            border-radius: 10px;
-            margin-bottom: 15px;
-            font-size: 13px;
-            color: #475569;
-            text-align: center;
         }
 
         .telegram-btn {
@@ -644,13 +569,8 @@ help - Get help
 </head>
 <body>
     <div class="container">
-        <!-- Header -->
-        <div class="header">
-            <h1>MomteTop</h1>
-        </div>
-
         <!-- Telegram Channel Button -->
-        <button class="telegram-btn" onclick="openTelegramChannel()" title="Join our Telegram Channel">
+        <button class="telegram-btn" onclick="openTelegramChannel()" title="Join Telegram">
             📱
         </button>
 
@@ -667,7 +587,7 @@ help - Get help
                 <div class="stats-grid">
                     <div class="stat-card">
                         <div class="stat-value" id="adsWatched">0</div>
-                        <div class="stat-label">Ads Watched Today</div>
+                        <div class="stat-label">Ads Today</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-value" id="referrals">0</div>
@@ -677,16 +597,8 @@ help - Get help
 
                 <!-- Watch Ad Section -->
                 <div class="watch-ad-section">
-                    <div class="vpn-warning" id="vpnWarning">
-                        ⚠️ Important: Connect to VPN if needed!
-                    </div>
-                    
                     <div class="daily-limit-warning" id="dailyLimitWarning">
                         🚫 Daily limit reached! Come back tomorrow!
-                    </div>
-                    
-                    <div class="ad-network-info" id="adNetworkInfo">
-                        📺 Network: <span id="currentAdNetwork">MoneyTag 1</span>
                     </div>
                     
                     <div class="ad-progress">
@@ -791,8 +703,8 @@ help - Get help
         <div id="profile" class="screen">
             <div class="main-content">
                 <div class="profile-info">
-                    <div class="profile-avatar" id="profileAvatar">M</div>
-                    <div class="profile-name" id="profileName">MomteTop User</div>
+                    <div class="profile-avatar" id="profileAvatar">U</div>
+                    <div class="profile-name" id="profileName">User</div>
                     <div class="profile-id" id="profileTelegramId">Loading...</div>
                 </div>
 
@@ -861,13 +773,12 @@ help - Get help
         </div>
     </div>
 
-    <!-- Firebase SDK (Version 9.22.0 - Tested & Working) -->
+    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 
-    <!-- Ad Network Scripts (Load after page) -->
+    <!-- Ad Network Scripts -->
     <script>
-        // Load ad scripts dynamically
         function loadAdScripts() {
             const script1 = document.createElement('script');
             script1.src = '//libtl.com/sdk.js';
@@ -880,18 +791,12 @@ help - Get help
             script2.setAttribute('data-zone', '10144322');
             script2.setAttribute('data-sdk', 'show_10144322');
             document.head.appendChild(script2);
-            
-            console.log('✅ Ad scripts loading...');
         }
-        
-        // Load ads after 2 seconds
         setTimeout(loadAdScripts, 2000);
     </script>
 
     <script>
-        // ============================================
-        // CONFIGURATION
-        // ============================================
+        // Configuration
         const FIREBASE_CONFIG = {
             apiKey: "AIzaSyAcymPZJc4nWUU8rvDZMOWcpAUxqDbRvIU",
             authDomain: "test-telegram-ad-network.firebaseapp.com",
@@ -903,22 +808,20 @@ help - Get help
         };
 
         const TELEGRAM_BOT_TOKEN = '8572228978:AAHxP8IvpqdTvVFJjN6jLVMaS30z3IGF2QA';
-        const TELEGRAM_BOT_USERNAME = 'momtetop_bot';
+        const TELEGRAM_BOT_USERNAME = 'TestTelegramAdNetwork_bot';
         const TELEGRAM_CHANNEL = 'https://t.me/momtetop';
         const ADMIN_CHAT_ID = '7325613142';
 
         const AD_NETWORKS = [
-            { name: 'MoneyTag 1', zone: '9786524', func: 'show_9786524', limit: 5 },
-            { name: 'MoneyTag 2', zone: '10144322', func: 'show_10144322', limit: 5 }
+            { name: 'Network 1', func: 'show_9786524', limit: 5 },
+            { name: 'Network 2', func: 'show_10144322', limit: 5 }
         ];
 
         const DAILY_AD_LIMIT = 10;
         const AD_REWARD = 0.01;
 
-        // Firebase
         let firebaseApp, firebaseDB;
         
-        // App State
         let appState = {
             balance: 0,
             adsWatched: 0,
@@ -939,13 +842,9 @@ help - Get help
             withdrawalHistory: []
         };
 
-        // ============================================
-        // FIREBASE INITIALIZATION
-        // ============================================
         function initFirebase() {
             try {
                 if (typeof firebase === 'undefined') {
-                    console.error('❌ Firebase not loaded, will retry...');
                     setTimeout(initFirebase, 1000);
                     return false;
                 }
@@ -960,12 +859,8 @@ help - Get help
             }
         }
 
-        // ============================================
-        // TELEGRAM INTEGRATION
-        // ============================================
         function getTelegramUserData() {
             try {
-                // Check Telegram WebApp
                 if (window.Telegram && window.Telegram.WebApp) {
                     const tg = window.Telegram.WebApp;
                     const user = tg.initDataUnsafe.user;
@@ -974,12 +869,10 @@ help - Get help
                         appState.telegramId = user.id;
                         appState.telegramName = user.first_name + (user.last_name ? ' ' + user.last_name : '');
                         appState.userId = 'tg_' + user.id;
-                        console.log('✅ Telegram user:', appState.telegramName);
                         return true;
                     }
                 }
                 
-                // Check URL parameters
                 const urlParams = new URLSearchParams(window.location.search);
                 const tgId = urlParams.get('tg_id');
                 
@@ -990,11 +883,9 @@ help - Get help
                     return true;
                 }
                 
-                // Fallback
                 appState.userId = 'user_' + Math.random().toString(36).substr(2, 9);
                 return false;
             } catch (error) {
-                console.error('Telegram error:', error);
                 appState.userId = 'user_' + Math.random().toString(36).substr(2, 9);
                 return false;
             }
@@ -1014,14 +905,10 @@ help - Get help
                 });
                 return (await response.json()).ok;
             } catch (error) {
-                console.error('Telegram send error:', error);
                 return false;
             }
         }
 
-        // ============================================
-        // FIREBASE DATABASE
-        // ============================================
         async function saveToFirebase() {
             if (!firebaseDB || !appState.userId) return;
             
@@ -1031,7 +918,6 @@ help - Get help
                     ...appState,
                     lastUpdated: firebase.database.ServerValue.TIMESTAMP
                 });
-                console.log('✅ Saved to Firebase');
             } catch (error) {
                 console.error('Firebase save error:', error);
             }
@@ -1046,12 +932,10 @@ help - Get help
                 
                 if (snapshot.exists()) {
                     appState = { ...appState, ...snapshot.val() };
-                    console.log('✅ Loaded from Firebase');
                     return true;
                 }
                 return false;
             } catch (error) {
-                console.error('Firebase load error:', error);
                 return false;
             }
         }
@@ -1060,14 +944,12 @@ help - Get help
             if (!firebaseDB) return;
             
             try {
-                // Save referral relationship
                 const referralRef = firebaseDB.ref('referrals/' + referrerId + '/' + newUserId);
                 await referralRef.set({
                     referredAt: firebase.database.ServerValue.TIMESTAMP,
                     userId: newUserId
                 });
                 
-                // Update referrer stats
                 const referrerRef = firebaseDB.ref('users/' + referrerId);
                 const snapshot = await referrerRef.once('value');
                 
@@ -1080,11 +962,10 @@ help - Get help
                         totalEarnings: (referrerData.totalEarnings || 0) + 0.01
                     });
                     
-                    // Notify referrer via Telegram
                     if (referrerData.telegramId) {
                         await sendTelegramMessage(
                             referrerData.telegramId,
-                            `🎉 <b>New Referral!</b>\n\nYou earned $0.01!\nTotal Referrals: ${(referrerData.referrals || 0) + 1}`
+                            '🎉 New Referral!\n\nYou earned $0.01!\nTotal Referrals: ' + ((referrerData.referrals || 0) + 1)
                         );
                     }
                 }
@@ -1093,9 +974,6 @@ help - Get help
             }
         }
 
-        // ============================================
-        // DAILY RESET
-        // ============================================
         function checkDailyReset() {
             const today = new Date().toDateString();
             
@@ -1105,7 +983,6 @@ help - Get help
                 appState.network2AdsWatched = 0;
                 appState.lastAdDate = today;
                 saveToFirebase();
-                console.log('✅ Daily reset');
             }
         }
 
@@ -1120,9 +997,6 @@ help - Get help
             return -1;
         }
 
-        // ============================================
-        // AD WATCHING
-        // ============================================
         async function watchAd() {
             if (!canWatchAd()) {
                 showAlert('❌ Daily limit reached!', 'error');
@@ -1147,13 +1021,10 @@ help - Get help
                     await showAdFunc();
                     handleAdSuccess(networkIndex);
                 } else {
-                    // Ad not ready, still reward
-                    console.log('Ad function not ready, rewarding anyway');
-                    setTimeout(() => handleAdSuccess(networkIndex), 2000);
+                    setTimeout(function() { handleAdSuccess(networkIndex); }, 2000);
                 }
             } catch (error) {
-                console.log('Ad error, rewarding anyway');
-                setTimeout(() => handleAdSuccess(networkIndex), 2000);
+                setTimeout(function() { handleAdSuccess(networkIndex); }, 2000);
             }
         }
 
@@ -1173,12 +1044,9 @@ help - Get help
             updateUI();
             
             const remaining = DAILY_AD_LIMIT - appState.dailyAdsWatched;
-            showAlert(`✅ Earned $0.01! ${remaining} remaining`, 'success');
+            showAlert('✅ Earned $0.01! ' + remaining + ' remaining', 'success');
         }
 
-        // ============================================
-        // WITHDRAWAL
-        // ============================================
         function checkWithdrawEligibility() {
             const withdrawBtn = document.getElementById('withdrawBtn');
             const needMoreDiv = document.getElementById('needMoreReferrals');
@@ -1213,7 +1081,7 @@ help - Get help
             
             const canWithdraw = appState.balance >= 60;
             withdrawBtn.disabled = !canWithdraw;
-            withdrawBtn.textContent = canWithdraw ? 'Request Withdrawal' : `Need $${(60 - appState.balance).toFixed(2)}`;
+            withdrawBtn.textContent = canWithdraw ? 'Request Withdrawal' : 'Need $' + (60 - appState.balance).toFixed(2);
         }
 
         async function processWithdrawal() {
@@ -1237,7 +1105,9 @@ help - Get help
             appState.lastReferralCount = appState.referrals;
             
             const withdrawal = {
-                amount, method, accountId,
+                amount: amount,
+                method: method,
+                accountId: accountId,
                 timestamp: new Date().toISOString(),
                 status: 'pending'
             };
@@ -1250,13 +1120,17 @@ help - Get help
                     userId: appState.userId,
                     telegramId: appState.telegramId,
                     userName: appState.telegramName,
-                    ...withdrawal
+                    amount: amount,
+                    method: method,
+                    accountId: accountId,
+                    timestamp: withdrawal.timestamp,
+                    status: 'pending'
                 });
             }
             
             await sendTelegramMessage(
                 ADMIN_CHAT_ID,
-                `💰 <b>WITHDRAWAL REQUEST</b>\n\nUser: ${appState.telegramName}\nID: ${appState.telegramId}\nAmount: $${amount}\nMethod: ${method}\nAccount: ${accountId}`
+                '💰 WITHDRAWAL REQUEST\n\nUser: ' + appState.telegramName + '\nID: ' + appState.telegramId + '\nAmount: $' + amount + '\nMethod: ' + method + '\nAccount: ' + accountId
             );
             
             updateUI();
@@ -1267,9 +1141,6 @@ help - Get help
             showAlert('✅ Withdrawal submitted!', 'success');
         }
 
-        // ============================================
-        // UI UPDATES
-        // ============================================
         function updateUI() {
             document.getElementById('balance').textContent = appState.balance.toFixed(2);
             document.getElementById('profileBalance').textContent = appState.balance.toFixed(2);
@@ -1280,18 +1151,13 @@ help - Get help
             document.getElementById('totalReferrals').textContent = appState.referrals;
             document.getElementById('referralEarnings').textContent = appState.referralEarnings.toFixed(2);
             document.getElementById('profileName').textContent = appState.telegramName;
-            document.getElementById('profileTelegramId').textContent = appState.telegramId ? `Telegram ID: ${appState.telegramId}` : 'Guest User';
+            document.getElementById('profileTelegramId').textContent = appState.telegramId ? 'ID: ' + appState.telegramId : 'Guest';
             document.getElementById('profileAvatar').textContent = appState.telegramName.charAt(0).toUpperCase();
             document.getElementById('joinDate').textContent = new Date(appState.joinDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
             
             const progress = (appState.dailyAdsWatched / DAILY_AD_LIMIT) * 100;
             document.getElementById('progressFill').style.width = progress + '%';
-            document.getElementById('progressText').textContent = `${appState.dailyAdsWatched}/${DAILY_AD_LIMIT} ads today`;
-            
-            const networkIndex = getCurrentNetwork();
-            if (networkIndex >= 0) {
-                document.getElementById('currentAdNetwork').textContent = AD_NETWORKS[networkIndex].name;
-            }
+            document.getElementById('progressText').textContent = appState.dailyAdsWatched + '/' + DAILY_AD_LIMIT + ' ads today';
             
             const dailyLimit = document.getElementById('dailyLimitWarning');
             const watchBtn = document.getElementById('watchAdBtn');
@@ -1309,12 +1175,8 @@ help - Get help
             checkWithdrawEligibility();
         }
 
-        // ============================================
-        // REFERRAL SYSTEM
-        // ============================================
         function generateReferralLink() {
-            const baseUrl = window.location.origin + window.location.pathname;
-            const link = `https://t.me/${TELEGRAM_BOT_USERNAME}?start=${appState.userId}`;
+            const link = 'https://t.me/' + TELEGRAM_BOT_USERNAME + '?start=' + appState.userId;
             document.getElementById('referralLink').value = link;
         }
 
@@ -1327,7 +1189,7 @@ help - Get help
                 document.execCommand('copy');
                 showAlert('✅ Link copied!', 'success');
             } catch (err) {
-                navigator.clipboard.writeText(input.value).then(() => {
+                navigator.clipboard.writeText(input.value).then(function() {
                     showAlert('✅ Link copied!', 'success');
                 });
             }
@@ -1338,35 +1200,37 @@ help - Get help
             const refId = urlParams.get('ref') || urlParams.get('start');
             
             if (refId && refId !== appState.userId) {
-                const key = 'momtetop_referred';
+                const key = 'app_referred';
                 if (!localStorage.getItem(key)) {
                     localStorage.setItem(key, refId);
                     await saveReferral(refId, appState.userId);
-                    showAlert('🎉 Welcome! Referred by friend!', 'success');
+                    showAlert('🎉 Referred by friend!', 'success');
                 }
             }
         }
 
-        // ============================================
-        // NAVIGATION
-        // ============================================
         function switchScreen(screenName) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.screen').forEach(function(s) { 
+                s.classList.remove('active'); 
+            });
             document.getElementById(screenName).classList.add('active');
             
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(function(b) { 
+                b.classList.remove('active'); 
+            });
             event.target.closest('.nav-btn').classList.add('active');
         }
 
-        function showAlert(message, type = 'info') {
+        function showAlert(message, type) {
+            type = type || 'info';
             const alert = document.createElement('div');
-            alert.className = `alert ${type}`;
+            alert.className = 'alert ' + type;
             alert.textContent = message;
             
             const screen = document.querySelector('.screen.active .main-content');
             screen.insertBefore(alert, screen.firstChild);
             
-            setTimeout(() => alert.remove(), 5000);
+            setTimeout(function() { alert.remove(); }, 5000);
         }
 
         function openTelegramChannel() {
@@ -1377,29 +1241,24 @@ help - Get help
             const urls = {
                 youtube: 'https://www.youtube.com/channel/UCsgXGprjKypcANwgpREXkxw',
                 telegram: TELEGRAM_CHANNEL,
-                bot: `https://t.me/${TELEGRAM_BOT_USERNAME}`
+                bot: 'https://t.me/' + TELEGRAM_BOT_USERNAME
             };
             
             if (urls[taskType]) {
                 window.open(urls[taskType], '_blank');
                 
-                setTimeout(async () => {
+                setTimeout(async function() {
                     const rewards = { youtube: 0.50, telegram: 0.30, bot: 0.20 };
                     appState.balance += rewards[taskType];
                     appState.totalEarnings += rewards[taskType];
                     await saveToFirebase();
                     updateUI();
-                    showAlert(`✅ Earned $${rewards[taskType].toFixed(2)}!`, 'success');
+                    showAlert('✅ Earned $' + rewards[taskType].toFixed(2) + '!', 'success');
                 }, 5000);
             }
         }
 
-        // ============================================
-        // INITIALIZATION
-        // ============================================
         async function initApp() {
-            console.log('🚀 Starting MomteTop...');
-            
             const fbReady = initFirebase();
             getTelegramUserData();
             
@@ -1411,21 +1270,16 @@ help - Get help
             await checkReferralCode();
             updateUI();
             generateReferralLink();
-            
-            console.log('✅ App ready!');
         }
 
-        // Auto-save
-        setInterval(() => {
+        setInterval(function() {
             if (firebaseDB) saveToFirebase();
         }, 30000);
 
-        // Save on exit
-        window.addEventListener('beforeunload', () => {
+        window.addEventListener('beforeunload', function() {
             if (firebaseDB) saveToFirebase();
         });
 
-        // Start app
         window.addEventListener('load', initApp);
     </script>
 </body>
