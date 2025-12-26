@@ -858,24 +858,6 @@
         // ==========================================
         // FIREBASE FUNCTIONS
         // ==========================================
-        function initFirebase() {
-            try {
-                if (typeof firebase === 'undefined') {
-                    console.log('⏳ Waiting for Firebase...');
-                    setTimeout(initFirebase, 500);
-                    return false;
-                }
-                
-                firebaseApp = firebase.initializeApp(FIREBASE_CONFIG);
-                firebaseDB = firebase.database();
-                console.log('✅ Firebase initialized');
-                return true;
-            } catch (error) {
-                console.error('❌ Firebase error:', error);
-                return false;
-            }
-        }
-
         async function saveToFirebase() {
             if (!firebaseDB || !appState.userId || !dataLoaded) {
                 console.log('⏳ Skip save - not ready');
@@ -1487,35 +1469,55 @@
         // UI UPDATE FUNCTIONS
         // ==========================================
         function updateUI() {
+            console.log('🎨 Updating UI with state:', {
+                balance: appState.balance,
+                username: appState.telegramUsername,
+                photoUrl: appState.telegramPhotoUrl,
+                telegramId: appState.telegramId
+            });
+            
+            // Update balance
             document.getElementById('balance').textContent = appState.balance.toFixed(2);
             document.getElementById('profileBalance').textContent = appState.balance.toFixed(2);
             document.getElementById('totalIncome').textContent = appState.totalIncome.toFixed(2);
+            
+            // Update stats
             document.getElementById('adsWatched').textContent = appState.dailyAdsWatched;
             document.getElementById('referrals').textContent = appState.referrals;
             document.getElementById('profileReferrals').textContent = appState.referrals;
             document.getElementById('profileAds').textContent = appState.adsWatched;
             document.getElementById('totalReferrals').textContent = appState.referrals;
             document.getElementById('referralEarnings').textContent = appState.referralEarnings.toFixed(2);
-            document.getElementById('profileName').textContent = appState.telegramName;
+            
+            // Update profile name
+            document.getElementById('profileName').textContent = appState.telegramName || 'User';
             
             // Update username
             const usernameEl = document.getElementById('profileUsername');
             if (appState.telegramUsername) {
                 usernameEl.textContent = '@' + appState.telegramUsername;
                 usernameEl.style.display = 'block';
+                console.log('✅ Username displayed:', '@' + appState.telegramUsername);
             } else {
                 usernameEl.style.display = 'none';
+                console.log('⚠️ No username to display');
             }
             
-            // Update ID
-            document.getElementById('profileTelegramId').textContent = appState.telegramId ? 'ID: ' + appState.telegramId : 'Guest';
+            // Update Telegram ID
+            const idText = appState.telegramId ? 'ID: ' + appState.telegramId : 'Guest User';
+            document.getElementById('profileTelegramId').textContent = idText;
+            console.log('✅ Telegram ID displayed:', idText);
             
             // Update avatar
             const avatar = document.getElementById('profileAvatar');
             if (appState.telegramPhotoUrl) {
-                avatar.innerHTML = '<img src="' + appState.telegramPhotoUrl + '" alt="Profile">';
+                avatar.innerHTML = '<img src="' + appState.telegramPhotoUrl + '" alt="Profile" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">';
+                console.log('✅ Profile photo set:', appState.telegramPhotoUrl.substring(0, 50) + '...');
             } else {
-                avatar.textContent = appState.telegramName.charAt(0).toUpperCase();
+                const firstLetter = (appState.telegramName || 'U').charAt(0).toUpperCase();
+                avatar.textContent = firstLetter;
+                avatar.innerHTML = firstLetter; // Clear any img tag
+                console.log('✅ Avatar letter set:', firstLetter);
             }
             
             // Update progress
@@ -1538,6 +1540,8 @@
             }
             
             checkWithdrawEligibility();
+            
+            console.log('✅ UI update complete');
         }
 
         function generateReferralLink() {
@@ -1596,58 +1600,83 @@
         // INITIALIZATION
         // ==========================================
         async function initApp() {
-            console.log('🚀 Initializing app...');
+            console.log('🚀 Starting app initialization...');
             
-            // 1. Initialize Firebase
-            const fbReady = initFirebase();
-            if (!fbReady) {
-                console.error('❌ Firebase failed to initialize');
+            // Step 1: Initialize Firebase first (must be synchronous)
+            if (typeof firebase === 'undefined') {
+                console.log('⏳ Waiting for Firebase SDK...');
+                setTimeout(initApp, 500);
                 return;
             }
             
-            // 2. Get Telegram data
-            await getTelegramUserData();
-            console.log('📱 Telegram ID:', appState.telegramId);
-            console.log('👤 Username:', appState.telegramUsername);
+            try {
+                firebaseApp = firebase.initializeApp(FIREBASE_CONFIG);
+                firebaseDB = firebase.database();
+                console.log('✅ Firebase initialized');
+            } catch (error) {
+                console.error('❌ Firebase init failed:', error);
+                return;
+            }
             
-            // 3. Load data from Firebase
+            // Step 2: Get Telegram user data
+            console.log('📱 Getting Telegram data...');
+            await getTelegramUserData();
+            console.log('✅ Telegram ID:', appState.telegramId);
+            console.log('✅ Username:', appState.telegramUsername);
+            console.log('✅ User ID:', appState.userId);
+            
+            // Step 3: Load existing data from Firebase
+            console.log('💾 Loading from Firebase...');
             await loadFromFirebase();
             
-            // 4. Check daily reset
+            // Step 4: Daily reset check
             checkDailyReset();
             
-            // 5. Check referral code
+            // Step 5: Check referral code
             await checkReferralCode();
             
-            // 6. Load tasks
+            // Step 6: Load tasks
             await loadTasks();
             
-            // 7. Update UI
+            // Step 7: Update UI
             updateUI();
             generateReferralLink();
             
-            console.log('✅ App initialized!');
-            console.log('💾 Current state:', appState);
+            console.log('✅ App fully initialized!');
+            console.log('📊 Current state:', {
+                userId: appState.userId,
+                telegramId: appState.telegramId,
+                username: appState.telegramUsername,
+                balance: appState.balance,
+                adsWatched: appState.adsWatched,
+                dailyAds: appState.dailyAdsWatched
+            });
         }
 
         // Auto-save every 30 seconds
         setInterval(function() {
-            if (firebaseDB && dataLoaded) {
+            if (firebaseDB && dataLoaded && appState.userId) {
+                console.log('🔄 Auto-saving...');
                 saveToFirebase();
             }
         }, 30000);
 
         // Save before leaving
         window.addEventListener('beforeunload', function() {
-            if (firebaseDB && dataLoaded) {
+            if (firebaseDB && dataLoaded && appState.userId) {
+                console.log('💾 Saving before exit...');
                 saveToFirebase();
             }
         });
 
         // Start app when page loads
-        window.addEventListener('load', initApp);
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initApp);
+        } else {
+            initApp();
+        }
         
-        console.log('📄 Script loaded');
+        console.log('📄 Script loaded and ready');
     </script>
 </body>
 </html>
